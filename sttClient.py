@@ -25,11 +25,28 @@ import Queue                                     # queue used for thread syncron
 import sys                                       # system calls
 import argparse                                  # for parsing arguments
 import base64                                    # necessary to encode in base64 according to the RFC2045 standard 
+import requests                                  # python HTTP requests library
 
 # WebSockets 
 from autobahn.twisted.websocket import WebSocketClientProtocol, WebSocketClientFactory, connectWS
 from twisted.python import log
 from twisted.internet import ssl, reactor
+
+class Utils:   
+
+   @staticmethod
+   def getAuthenticationToken(hostname, serviceName, username, password):
+      
+      uri = hostname +  "/authorization/api/v1/token?url=" + hostname + '/' + serviceName + "/api" 
+      uri = uri.replace("wss://", "https://");
+      uri = uri.replace("ws://", "https://");
+      print uri
+      resp = requests.get(uri, auth=(username, password), verify=False, headers= {'Accept': 'application/json'}, 
+                          timeout= (30, 30))
+      print resp.text
+      jsonObject = resp.json()
+      return jsonObject['token']
+
 
 class WSInterfaceFactory(WebSocketClientFactory):
 
@@ -237,6 +254,7 @@ if __name__ == '__main__':
    parser.add_argument('-type', action='store', dest='contentType', default='audio/wav', help='audio content type, for example: \'audio/l16; rate=44100\'')
    parser.add_argument('-model', action='store', dest='model', default='en-US_BroadbandModel', help='STT model that will be used')
    parser.add_argument('-threads', action='store', dest='threads', default='1', help='number of simultaneous STT sessions', type=check_positive_int)
+   parser.add_argument('-tokenauth', action='store_true', dest='tokenauth', help='use token based authentication')
    args = parser.parse_args()
 
    # create output directory if necessary
@@ -262,13 +280,20 @@ if __name__ == '__main__':
       print fileName
       q.put((fileNumber,fileName))   
       fileNumber += 1
-   
+
+   hostname = "stream.watsonplatform.net"   
    headers = {}
-   string = args.credentials[0] + ":" + args.credentials[1]
-   headers["Authorization"] = "Basic " + base64.b64encode(string)
+
+   # authentication header
+   if args.tokenauth:
+      headers['X-Watson-Authorization-Token'] = Utils.getAuthenticationToken("https://" + hostname, 'speech-to-text', 
+                                                                             args.credentials[0], args.credentials[1])
+   else:
+      string = args.credentials[0] + ":" + args.credentials[1]
+      headers["Authorization"] = "Basic " + base64.b64encode(string)
 
    # create a WS server factory with our protocol
-   url = "wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize?model=" + args.model
+   url = "wss://" + hostname + "/speech-to-text/api/v1/recognize?model=" + args.model
    summary = {}
    factory = WSInterfaceFactory(q, summary, args.dirOutput, args.contentType, args.model, url, headers, debug=False)
    factory.protocol = WSInterfaceProtocol

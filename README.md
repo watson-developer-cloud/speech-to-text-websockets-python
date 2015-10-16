@@ -16,6 +16,12 @@ $ pip install twisted
 $ pip install autobahn
 `
 
+In order to you token based authentication it is necessary to install the requests library
+
+`
+$ pip install requests
+`
+
 If you need to upgrade your existing versions of twisted or autobhan you can type
 
 `
