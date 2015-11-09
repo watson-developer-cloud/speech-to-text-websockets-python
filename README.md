@@ -6,43 +6,17 @@ This project consists of a python client that interacts with the IBM Watson Spee
 
 ## installation
 
-There are some dependencies that need to be installed for this script to work. In order to interact with the STT service via WebSockets it is necessary to install the 'twisted' and 'autobahn' libraries. An updated version of these libraries can be installed by typing:
+There are some dependencies that need to be installed for this script to work. In order to interact with the STT service via WebSockets it is necessary to install [pip](https://pip.readthedocs.org/en/1.1/installing.html), then write the following commands:
 
 `
-$ pip install twisted
+pip install -r requirements.txt
 `
 
-`
-$ pip install autobahn
-`
-
-In order to you token based authentication it is necessary to install the requests library
-
-`
-$ pip install requests
-`
-
-If you need to upgrade your existing versions of twisted or autobhan you can type
-
-`
-$ pip install twisted --upgrade
-`
-
-`
-$ pip install autobahn --upgrade
-`
-
-Sometimes you may need to install some additional dependencies, check the following commands:
-
-`
-$ pip install pyOpenSSL
-`
+You also may need to write this command
 
 `
 $ apt-get install build-essential python-dev
 `
-
-Finally, the version 0.10.3 of Autobahn comes with a bug/typo that you need to fix by changing 'taxio' to 'txaio' in /usr/local/lib/python2.7/dist-packages/autobahn/websocket/protocol.py
 
 ## Examples                                                                                                                                        
                                                                                                                                                     
