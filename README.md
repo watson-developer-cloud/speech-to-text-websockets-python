@@ -4,9 +4,9 @@
 
 This project consists of a python client that interacts with the IBM Watson Speech To Text service through its WebSockets interface. The client streams audio to the STT service and receives recognition hypotheses in real time. It can run N simultaneous recognition sessions
 
-## installation
+## Installation
 
-There are some dependencies that need to be installed for this script to work. In order to interact with the STT service via WebSockets it is necessary to install [pip](https://pip.readthedocs.org/en/1.1/installing.html), then write the following commands:
+There are some dependencies that need to be installed for this script to work. In order to interact with the STT service via WebSockets, it is necessary to install [pip](https://pip.readthedocs.org/en/1.1/installing.html), then write the following commands:
 
 `
 pip install -r requirements.txt
