@@ -248,7 +248,7 @@ if __name__ == '__main__':
 
    # parse command line parameters
    parser = argparse.ArgumentParser(description='client to do speech recognition using the WebSocket interface to the Watson STT service')
-   parser.add_argument('-credentials', action='store', dest='credentials', help='Basic Authentication credentials in the form \'username:password\'', type=check_credentials)
+   parser.add_argument('-credentials', action='store', dest='credentials', help='Basic Authentication credentials in the form \'username:password\'', required=True, type=check_credentials)
    parser.add_argument('-in', action='store', dest='fileInput', default='./recordings.txt', help='text file containing audio files')
    parser.add_argument('-out', action='store', dest='dirOutput', default='./output', help='output directory')
    parser.add_argument('-type', action='store', dest='contentType', default='audio/wav', help='audio content type, for example: \'audio/l16; rate=44100\'')
