@@ -52,7 +52,7 @@ class WSInterfaceFactory(WebSocketClientFactory):
 
    def __init__(self, queue, summary, dirOutput, contentType, model, url=None, headers=None, debug=None):
 
-      WebSocketClientFactory.__init__(self, url=url, headers=headers, debug=debug)   
+      WebSocketClientFactory.__init__(self, url=url, headers=headers)   
       self.queue = queue
       self.summary = summary
       self.dirOutput = dirOutput
