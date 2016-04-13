@@ -6,7 +6,7 @@ This project consists of a python client that interacts with the IBM Watson Spee
 
 ## Installation
 
-There are some dependencies that need to be installed for this script to work. In order to interact with the STT service via WebSockets, it is necessary to install [pip](https://pip.readthedocs.org/en/1.1/installing.html), then write the following commands:
+There are some dependencies that need to be installed for this script to work. It is advisable to install the required packages in a separate virtual environment. Certain packages have been observed to conflict with the package requirements for this script; in particular the package nose conflicts with these required packages. In order to interact with the STT service via WebSockets, it is necessary to install [pip](https://pip.readthedocs.org/en/1.1/installing.html), then write the following commands:
 
 `
 pip install -r requirements.txt
@@ -17,6 +17,8 @@ You also may need to write this command
 `
 $ apt-get install build-essential python-dev
 `
+
+If you are creating an environment using anaconda, proceed with the above pip command to install the packages--do not use conda to install the requirements as conda will install nose as a dependency.
 
 ## Examples                                                                                                                                        
                                                                                                                                                     
