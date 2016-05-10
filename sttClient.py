@@ -60,8 +60,8 @@ class WSInterfaceFactory(WebSocketClientFactory):
       self.model = model
       self.queueProto = Queue.Queue()
 
-      self.openHandshakeTimeout = 6
-      self.closeHandshakeTimeout = 6
+      self.openHandshakeTimeout = 10
+      self.closeHandshakeTimeout = 10
 
       # start the thread that takes care of ending the reactor so the script can finish automatically (without ctrl+c)
       endingThread = threading.Thread(target=self.endReactor, args= ())
@@ -164,7 +164,6 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
       dataFile = f.read()
       self.maybeSendChunk(dataFile)
       print "onOpen ends"      
-
    
    def onMessage(self, payload, isBinary):
 
@@ -211,8 +210,6 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
       print("WebSocket connection closed: {0}".format(reason), "code: ", code, "clean: ", wasClean, "reason: ", reason)
       self.summary[self.uttNumber]['status']['code'] = code
       self.summary[self.uttNumber]['status']['reason'] = reason
-      if (code == 1000):
-         self.summary[self.uttNumber]['status']['successful'] = True
       
       # create a new WebSocket connection if there are still utterances in the queue that need to be processed
       self.queue.task_done()
@@ -226,7 +223,6 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
       else:
          contextFactory = None
       connectWS(self.factory, contextFactory)
-
 
 # function to check that a value is a positive integer
 def check_positive_int(value):
@@ -318,7 +314,7 @@ if __name__ == '__main__':
    successful = 0 
    emptyHypotheses = 0
    for key, value in (sorted(summary.items())):
-      if value['status']['successful'] == True:
+      if value['status']['code'] == 1000:
          print key, ": ", value['status']['code'], " ", value['hypothesis'].encode('utf-8')
          successful += 1
          if value['hypothesis'][0] == "":
