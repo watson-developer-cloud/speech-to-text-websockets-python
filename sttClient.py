@@ -250,6 +250,7 @@ if __name__ == '__main__':
    parser.add_argument('-type', action='store', dest='contentType', default='audio/wav', help='audio content type, for example: \'audio/l16; rate=44100\'')
    parser.add_argument('-model', action='store', dest='model', default='en-US_BroadbandModel', help='STT model that will be used')
    parser.add_argument('-threads', action='store', dest='threads', default='1', help='number of simultaneous STT sessions', type=check_positive_int)
+   parser.add_argument('-optout', action='store_true', dest='optOut', help='specify opt-out header so user data, such as speech and hypotheses are not logged into the server')
    parser.add_argument('-tokenauth', action='store_true', dest='tokenauth', help='use token based authentication')
    args = parser.parse_args()
 
@@ -279,6 +280,8 @@ if __name__ == '__main__':
 
    hostname = "stream.watsonplatform.net"   
    headers = {}
+   if (args.optOut == True):      
+      headers['X-WDC-PL-OPT-OUT'] = '1'
 
    # authentication header
    if args.tokenauth:
@@ -288,6 +291,7 @@ if __name__ == '__main__':
       string = args.credentials[0] + ":" + args.credentials[1]
       headers["Authorization"] = "Basic " + base64.b64encode(string)
 
+   print headers
    # create a WS server factory with our protocol
    url = "wss://" + hostname + "/speech-to-text/api/v1/recognize?model=" + args.model
    summary = {}
