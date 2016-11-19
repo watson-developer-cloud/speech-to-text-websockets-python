@@ -324,7 +324,7 @@ if __name__ == '__main__':
          if value['hypothesis'][0] == "":
             emptyHypotheses += 1
       else:
-         print key + ": ", value['status']['code'], " REASON: ", value['status']['reason']
+         print str(key) + ": ", value['status']['code'], " REASON: ", value['status']['reason']
       f.write(str(counter) + ": " + value['hypothesis'].encode('utf-8') + "\n")
       counter += 1
    f.close()
