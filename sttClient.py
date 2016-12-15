@@ -34,6 +34,7 @@ from autobahn.twisted.websocket import WebSocketClientProtocol, \
 from twisted.python import log
 from twisted.internet import ssl, reactor
 
+
 class Utils:
 
     @staticmethod
@@ -41,12 +42,12 @@ class Utils:
 
         uri = hostname + "/authorization/api/v1/token?url=" + hostname + '/' \
               + serviceName + "/api"
-        uri = uri.replace("wss://", "https://");
-        uri = uri.replace("ws://", "https://");
+        uri = uri.replace("wss://", "https://")
+        uri = uri.replace("ws://", "https://")
         print uri
         resp = requests.get(uri, auth=(username, password), verify=False,
-                            headers= {'Accept': 'application/json'},
-                            timeout= (30, 30))
+                            headers={'Accept': 'application/json'},
+                            timeout=(30, 30))
         print resp.text
         jsonObject = resp.json()
         return jsonObject['token']
@@ -70,7 +71,7 @@ class WSInterfaceFactory(WebSocketClientFactory):
 
         # start the thread that takes care of ending the reactor so
         # the script can finish automatically (without ctrl+c)
-        endingThread = threading.Thread(target=self.endReactor, args= ())
+        endingThread = threading.Thread(target=self.endReactor, args=())
         endingThread.daemon = True
         endingThread.start()
 
@@ -105,6 +106,7 @@ class WSInterfaceFactory(WebSocketClientFactory):
                    "should not have been called")
             return None
 
+
 # WebSockets interface to the STT service
 #
 # note: an object of this class is created for each WebSocket
@@ -131,8 +133,8 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
 
         self.uttNumber = utt[0]
         self.uttFilename = utt[1]
-        self.summary[self.uttNumber] = {"hypothesis":"",
-                                        "status":{"code":"", "reason":""}}
+        self.summary[self.uttNumber] = {"hypothesis": "",
+                                        "status": {"code": "", "reason": ""}}
         self.fileJson = self.dirOutput + "/" + str(self.uttNumber) + \
                         ".json.txt"
         try:
@@ -142,19 +144,19 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
 
     # helper method that sends a chunk of audio if needed (as required
     # what the specified pacing is)
-    def maybeSendChunk(self,data):
+    def maybeSendChunk(self, data):
 
         def sendChunk(chunk, final=False):
             self.bytesSent += len(chunk)
-            self.sendMessage(chunk, isBinary = True)
+            self.sendMessage(chunk, isBinary=True)
             if final:
-                self.sendMessage(b'', isBinary = True)
+                self.sendMessage(b'', isBinary=True)
 
-        if (self.bytesSent+self.chunkSize >= len(data)):
+        if (self.bytesSent + self.chunkSize >= len(data)):
             if (len(data) > self.bytesSent):
-                sendChunk(data[self.bytesSent:len(data)],True)
+                sendChunk(data[self.bytesSent:len(data)], True)
                 return
-        sendChunk(data[self.bytesSent:self.bytesSent+self.chunkSize])
+        sendChunk(data[self.bytesSent:self.bytesSent + self.chunkSize])
         self.factory.reactor.callLater(0.01, self.maybeSendChunk, data=data)
         return
 
@@ -163,8 +165,8 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
 
     def onOpen(self):
         print "onOpen"
-        data = {"action" : "start", "content-type" : str(self.contentType),
-                "continuous" : True, "interim_results" : True,
+        data = {"action": "start", "content-type": str(self.contentType),
+                "continuous": True, "interim_results": True,
                 "inactivity_timeout": 600}
         data['word_confidence'] = True
         data['timestamps'] = True
@@ -176,7 +178,7 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         # start sending audio right away (it will get buffered in the
         # STT service)
         print self.uttFilename
-        f = open(str(self.uttFilename),'rb')
+        f = open(str(self.uttFilename), 'rb')
         self.bytesSent = 0
         dataFile = f.read()
         self.maybeSendChunk(dataFile)
@@ -210,7 +212,7 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
                 else:
                     # dump the message to the output directory
                     jsonObject = json.loads(payload.decode('utf8'))
-                    f = open(self.fileJson,"a")
+                    f = open(self.fileJson, "a")
                     f.write(json.dumps(jsonObject, indent=4, sort_keys=True))
                     f.close()
 
@@ -245,6 +247,7 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
             contextFactory = None
         connectWS(self.factory, contextFactory)
 
+
 # function to check that a value is a positive integer
 def check_positive_int(value):
     ivalue = int(value)
@@ -252,6 +255,7 @@ def check_positive_int(value):
         raise argparse.ArgumentTypeError(
             "\"%s\" is an invalid positive int value" % value)
     return ivalue
+
 
 # function to check the credentials format
 def check_credentials(credentials):
@@ -268,7 +272,7 @@ if __name__ == '__main__':
     # parse command line parameters
     parser = argparse.ArgumentParser(
         description=('client to do speech recognition using the WebSocket '
-                     'interface to the Watson STT service')
+                     'interface to the Watson STT service'))
     parser.add_argument(
         '-credentials', action='store', dest='credentials',
         help="Basic Authentication credentials in the form 'username:password'",
@@ -291,10 +295,11 @@ if __name__ == '__main__':
     parser.add_argument(
         '-optout', action='store_true', dest='optOut',
         help=('specify opt-out header so user data, such as speech and '
-              'hypotheses are not logged into the server')
+              'hypotheses are not logged into the server'))
     parser.add_argument(
         '-tokenauth', action='store_true', dest='tokenauth',
         help='use token based authentication')
+
     args = parser.parse_args()
 
     # create output directory if necessary
@@ -320,12 +325,12 @@ if __name__ == '__main__':
     fileNumber = 0
     for fileName in(lines):
         print fileName
-        q.put((fileNumber,fileName))
+        q.put((fileNumber, fileName))
         fileNumber += 1
 
     hostname = "stream.watsonplatform.net"
     headers = {}
-    if (args.optOut == True):
+    if (args.optOut is True):
         headers['X-WDC-PL-OPT-OUT'] = '1'
 
     # authentication header
@@ -333,7 +338,7 @@ if __name__ == '__main__':
         headers['X-Watson-Authorization-Token'] = (
             Utils.getAuthenticationToken(
                 "https://" + hostname, 'speech-to-text',
-                args.credentials[0], args.credentials[1])
+                args.credentials[0], args.credentials[1]))
     else:
         string = args.credentials[0] + ":" + args.credentials[1]
         headers["Authorization"] = "Basic " + base64.b64encode(string)
@@ -347,7 +352,7 @@ if __name__ == '__main__':
                                  args.model, url, headers, debug=False)
     factory.protocol = WSInterfaceProtocol
 
-    for i in range(min(int(args.threads),q.qsize())):
+    for i in range(min(int(args.threads), q.qsize())):
 
         factory.prepareUtterance()
 
@@ -362,7 +367,7 @@ if __name__ == '__main__':
 
     # dump the hypotheses to the output file
     fileHypotheses = args.dirOutput + "/hypotheses.txt"
-    f = open(fileHypotheses,"w")
+    f = open(fileHypotheses, "w")
     counter = 1
     successful = 0
     emptyHypotheses = 0
@@ -381,5 +386,5 @@ if __name__ == '__main__':
         counter += 1
     f.close()
     print ("successful sessions: ", successful, " (",
-           len(summary)-successful, " errors) (" +
+           len(summary) - successful, " errors) (" +
            str(emptyHypotheses) + " empty hypotheses)")
