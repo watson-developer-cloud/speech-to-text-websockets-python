@@ -375,7 +375,10 @@ if __name__ == '__main__':
     f = open(fileHypotheses, "w")
     successful = 0
     emptyHypotheses = 0
-    for counter, key, value in enumerate(sorted(summary.items())):
+    print sorted(summary.items())
+    counter = 0
+    for key, value in enumerate(sorted(summary.items())):
+        value = value[1]  
         if value['status']['code'] == 1000:
             print('{}: {} {}'.format(key, value['status']['code'],
                                      value['hypothesis'].encode('utf-8')))
@@ -385,8 +388,8 @@ if __name__ == '__main__':
         else:
             fmt = '{}: {status[code]} REASON: {status[reason]}'
             print(fmt.format(key, **status))
-        f.write('{}: {}\n'.format(counter + 1,
-                                  value['hypothesis'].encode('utf-8')))
+        f.write('{}: {}\n'.format(counter + 1, value['hypothesis'].encode('utf-8')))
+        counter += 1
     f.close()
     fmt = "successful sessions: {} ({} errors) ({} empty hypotheses)"
     print(fmt.format(successful, len(summary) - successful, emptyHypotheses))
