@@ -297,6 +297,12 @@ if __name__ == '__main__':
         '-model', action='store', dest='model', default='en-US_BroadbandModel',
         help='STT model that will be used')
     parser.add_argument(
+        '-amcustom', action='store', dest='am_custom_id', default=None,
+        help='id of the acoustic model customization that will be used', required=False)
+    parser.add_argument(
+        '-lmcustom', action='store', dest='lm_custom_id', default=None,
+        help='id of the language model customization that will be used', required=False)
+    parser.add_argument(
         '-threads', action='store', dest='threads', default='1',
         help='number of simultaneous STT sessions', type=check_positive_int)
     parser.add_argument(
@@ -352,6 +358,11 @@ if __name__ == '__main__':
     # create a WS server factory with our protocol
     fmt = "wss://{}/speech-to-text/api/v1/recognize?model={}"
     url = fmt.format(hostname, args.model)
+    if args.am_custom_id != None:
+        url += "&acoustic_customization_id=" + args.am_custom_id
+    if args.lm_custom_id != None:
+        url += "&customization_id=" + args.lm_custom_id
+    print url
     summary = {}
     factory = WSInterfaceFactory(q, summary, args.dirOutput, args.contentType,
                                  args.model, url, headers, debug=False)
