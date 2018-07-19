@@ -21,7 +21,7 @@
 import json                        # json
 import threading                   # multi threading
 import os                          # for listing directories
-import Queue                       # queue used for thread syncronization
+import queue as Queue              # queue used for thread syncronization
 import sys                         # system calls
 import argparse                    # for parsing arguments
 import base64                      # necessary to encode in base64
@@ -352,7 +352,7 @@ if __name__ == '__main__':
                                          args.credentials[1]))
     else:
         auth = args.credentials[0] + ":" + args.credentials[1]
-        headers["Authorization"] = "Basic " + base64.b64encode(auth)
+        headers["Authorization"] = "Basic " + base64.b64encode(auth.encode()).decode('utf-8')
 
     print(headers)
     # create a WS server factory with our protocol
@@ -362,7 +362,7 @@ if __name__ == '__main__':
         url += "&acoustic_customization_id=" + args.am_custom_id
     if args.lm_custom_id != None:
         url += "&customization_id=" + args.lm_custom_id
-    print url
+    print(url)
     summary = {}
     factory = WSInterfaceFactory(q, summary, args.dirOutput, args.contentType,
                                  args.model, url, headers, debug=False)
@@ -386,7 +386,7 @@ if __name__ == '__main__':
     f = open(fileHypotheses, "w")
     successful = 0
     emptyHypotheses = 0
-    print sorted(summary.items())
+    print(sorted(summary.items()))
     counter = 0
     for key, value in enumerate(sorted(summary.items())):
         value = value[1]  
