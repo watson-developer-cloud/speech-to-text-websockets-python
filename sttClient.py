@@ -15,7 +15,7 @@
 #
 
 # Author: Daniel Bolanos
-# Date:   2015
+# Date:   2019
 
 # coding=utf-8
 import json                        # json
@@ -56,6 +56,19 @@ class Utils:
         print(resp.text)
         jsonObject = resp.json()
         return jsonObject['token']
+
+    @staticmethod
+    def getAuthenticationTokenIAM(apikey):
+
+        uri = 'https://iam.bluemix.net/identity/token'
+        headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json'}
+        data = "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey="
+        data += apikey
+        resp = requests.post(uri, verify=False, headers= {'Accept': 'application/json'}, data=data,
+                  timeout= (30, 30))
+        print("getting token, status code: " + str(resp.status_code))
+        jsonObject = resp.json()
+        return jsonObject['access_token']   
 
 
 class WSInterfaceFactory(WebSocketClientFactory):
@@ -280,10 +293,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description=('client to do speech recognition using the WebSocket '
                      'interface to the Watson STT service'))
-    parser.add_argument(
-        '-credentials', action='store', dest='credentials',
-        help="Basic Authentication credentials in the form 'username:password'",
-        required=True, type=check_credentials)
+
+    parser.add_argument(                                                                                  
+        '-apikey', action='store', dest='apikey',                                                 
+        help="IAM apikey to access the speech-to-text service'",                            
+        required=True)  
+    #parser.add_argument(
+    #    '-credentials', action='store', dest='credentials',
+    #    help="Basic Authentication credentials in the form 'username:password'",
+    #    required=True, type=check_credentials)
     parser.add_argument(
         '-in', action='store', dest='fileInput', default='./recordings.txt',
         help='text file containing audio files')
@@ -344,20 +362,22 @@ if __name__ == '__main__':
     headers = {'X-WDC-PL-OPT-OUT': '1'} if args.optOut else {}
 
     # authentication header
-    if args.tokenauth:
-        headers['X-Watson-Authorization-Token'] = (
-            Utils.getAuthenticationToken('https://' + hostname,
-                                         'speech-to-text',
-                                         args.credentials[0],
-                                         args.credentials[1]))
-    else:
-        auth = args.credentials[0] + ":" + args.credentials[1]
-        headers["Authorization"] = "Basic " + base64.b64encode(auth.encode()).decode('utf-8')
+    #if args.tokenauth:
+    #    headers['X-Watson-Authorization-Token'] = (
+    #        Utils.getAuthenticationToken('https://' + hostname,
+    #                                     'speech-to-text',
+    #                                     args.credentials[0],
+    #                                     args.credentials[1]))
+    #else:
+    #    auth = args.credentials[0] + ":" + args.credentials[1]
+    #    headers["Authorization"] = "Basic " + base64.b64encode(auth.encode()).decode('utf-8')
 
+    access_token = Utils.getAuthenticationTokenIAM(args.apikey)
+    
     print(headers)
     # create a WS server factory with our protocol
-    fmt = "wss://{}/speech-to-text/api/v1/recognize?model={}"
-    url = fmt.format(hostname, args.model)
+    fmt = "wss://{}/speech-to-text/api/v1/recognize?access_token={}&model={}"
+    url = fmt.format(hostname, access_token, args.model)
     if args.am_custom_id != None:
         url += "&acoustic_customization_id=" + args.am_custom_id
     if args.lm_custom_id != None:
