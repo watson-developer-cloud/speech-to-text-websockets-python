@@ -1,4 +1,4 @@
-This sample has been deprecated. Please use the Official [Watson Python SDK](https://github.com/watson-developer-cloud/python-sdk)
+## This sample has been deprecated. Please use the Official [Watson Python SDK](https://github.com/watson-developer-cloud/python-sdk)
 
 ## Synopsis
 
